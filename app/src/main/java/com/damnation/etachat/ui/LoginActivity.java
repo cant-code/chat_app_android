@@ -12,7 +12,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.damnation.etachat.R;
+import com.damnation.etachat.http.HTTPClient;
+import com.damnation.etachat.http.LoginCallback;
+import com.damnation.etachat.token.Token;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.HashMap;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -21,14 +27,20 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private ProgressBar progressBar;
     private Preferences preferences;
+    private HTTPClient httpClient;
+    private Token token;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        httpClient = HTTPClient.INSTANCE;
         preferences = new Preferences(this);
+        token = Token.INSTANCE;
         if(preferences.isLoggedIn()) {
-            showLoginDialog();
+            String tokenVal = preferences.getToken();
+            String id = preferences.getId();
+            token.setToken(tokenVal, id);
         }
 
         setContentView(R.layout.activity_login);
@@ -62,6 +74,13 @@ public class LoginActivity extends AppCompatActivity {
         };
     }
 
+    private void initialLoginState() {
+        textUsernameLayout.setEnabled(true);
+        textPasswordLayout.setEnabled(true);
+        loginButton.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+
     private void onLoginClick() {
         String username = textUsernameLayout.getEditText().getText().toString();
         String password = textPasswordLayout.getEditText().getText().toString();
@@ -69,40 +88,56 @@ public class LoginActivity extends AppCompatActivity {
             textUsernameLayout.setError("Username must not be empty");
         } else if(password.isEmpty()) {
             textPasswordLayout.setError("Password must not be empty");
-        } else if(!username.equals("admin") && !password.equals("admin")) {
-            showErrorDialog();
         } else {
-            performLogin();
+            performLogin(username, password);
         }
     }
 
-    private void showErrorDialog() {
+    private void showErrorDialog(String message) {
         new AlertDialog.Builder(this)
                 .setTitle("Login Failed")
-                .setMessage("Username or Password is invalid. Please try again")
+                .setMessage(message)
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
+        initialLoginState();
     }
 
-    private void showLoginDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Login Successful")
-                .setMessage("Logged In successfully")
-                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-                .show();
+    private void showLoginSnackbar() {
+        View rootView = findViewById(android.R.id.content);
+        Snackbar snackbar = Snackbar.make(rootView, "Login Successful", Snackbar.LENGTH_INDEFINITE);
+        snackbar.setActionTextColor(getResources().getColor(R.color.cyan_500));
+        snackbar.setAction("Close", v -> {
+            snackbar.dismiss();
+            initialLoginState();
+        });
+        snackbar.show();
     }
 
-    private void performLogin() {
-        preferences.setLoggedIn(true);
+    private void performLogin(String username, String password) {
+//        preferences.setLoggedIn(true);
         textUsernameLayout.setEnabled(false);
         textPasswordLayout.setEnabled(false);
         loginButton.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
+        httpClient.login(new LoginCallback() {
+            @Override
+            public void onSuccess(HashMap<String, String> map) {
+                runOnUiThread(() -> {
+                    String id = map.get("id");
+                    String tokenVal = map.get("token");
+                    token.setToken(tokenVal, id);
+                    System.out.println(id + " " + tokenVal);
+                    preferences.setLoggedIn(true, id, tokenVal);
+                    showLoginSnackbar();
+                });
+            }
 
-        Handler handler = new Handler();
-        handler.postDelayed(() -> {
-            showLoginDialog();
-//            finish();
-        }, 2000);
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    showErrorDialog(message);
+                });
+            }
+        }, username, password);
     }
 }
