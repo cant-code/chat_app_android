@@ -17,7 +17,6 @@ public class HTTPClient {
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     public static final String BASE_URL = "https://etachat.herokuapp.com/api";
     public static final String USERS = "/users";
-    public static final String LOGIN = "/login";
 
     private OkHttpClient client;
     private Gson gson;
@@ -37,7 +36,7 @@ public class HTTPClient {
         RequestBody body = RequestBody.create(JSON, post);
         Request request = new Request.Builder()
                 .post(body)
-                .url(BASE_URL + USERS + LOGIN)
+                .url(BASE_URL + USERS + "/login")
                 .build();
         executor.execute(() -> {
             try {
@@ -47,14 +46,45 @@ public class HTTPClient {
                 Type type = new TypeToken<HashMap<String, String>>(){}.getType();
                 assert responseBody != null;
                 String json = responseBody.string();
-                System.out.println(json);
-                System.out.println(code);
                 HashMap<String, String> resp = gson.fromJson(json, type);
                 if(code == 404 || code == 400) {
                     callback.onError(resp.get("Error"));
                     return;
                 }
                 callback.onSuccess(resp);
+            } catch (IOException e) {
+                callback.onError("An Error Occurred");
+            }
+        });
+    }
+
+    public void register(RegisterCallback callback, String username, String email, String password) {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("email", email);
+        data.put("username", username);
+        data.put("password", password);
+        data.put("password2", password);
+        String post = gson.toJson(data);
+        RequestBody body = RequestBody.create(JSON, post);
+        Request request = new Request.Builder()
+                .post(body)
+                .url(BASE_URL + USERS + "/register")
+                .build();
+        executor.execute(() -> {
+            try {
+                Response response = client.newCall(request).execute();
+                ResponseBody responseBody = response.body();
+                int code = response.code();
+                Type type = new TypeToken<HashMap<String, String>>(){}.getType();
+                assert responseBody != null;
+                String json = responseBody.string();
+                HashMap<String, String> resp = gson.fromJson(json, type);
+                System.out.println(resp);
+                if(code == 404 || code == 400) {
+                    callback.onError(resp.get("error"));
+                    return;
+                }
+                callback.onSuccess();
             } catch (IOException e) {
                 callback.onError("An Error Occurred");
             }

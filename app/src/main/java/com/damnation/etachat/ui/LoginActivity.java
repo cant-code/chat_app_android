@@ -2,8 +2,6 @@ package com.damnation.etachat.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
@@ -20,11 +18,14 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.HashMap;
 
+import static com.damnation.etachat.ui.RegisterActivity.getTextWatcher;
+
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputLayout textUsernameLayout;
     private TextInputLayout textPasswordLayout;
     private Button loginButton;
+    private Button registerButton;
     private ProgressBar progressBar;
     private Preferences preferences;
     private HTTPClient httpClient;
@@ -33,6 +34,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        String message = intent.getStringExtra("snackbar_message");
+        if(message != null) {
+            showSnackbar(message);
+        }
 
         httpClient = HTTPClient.INSTANCE;
         preferences = new Preferences(this);
@@ -48,35 +55,23 @@ public class LoginActivity extends AppCompatActivity {
         textUsernameLayout = findViewById(R.id.username);
         textPasswordLayout = findViewById(R.id.password);
         loginButton = findViewById(R.id.login);
+        registerButton = findViewById(R.id.signUpButton);
         progressBar = findViewById(R.id.loading);
         loginButton.setOnClickListener(v -> onLoginClick());
+        registerButton.setOnClickListener(v -> startRegisterActivity());
 
         textUsernameLayout.getEditText().addTextChangedListener(createTextWatcher(textUsernameLayout));
         textPasswordLayout.getEditText().addTextChangedListener(createTextWatcher(textPasswordLayout));
     }
 
     private TextWatcher createTextWatcher(TextInputLayout textInputLayout) {
-        return new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                textInputLayout.setError(null);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        };
+        return getTextWatcher(textInputLayout);
     }
 
     private void initialLoginState() {
         textUsernameLayout.setEnabled(true);
         textPasswordLayout.setEnabled(true);
+        registerButton.setEnabled(true);
         loginButton.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
     }
@@ -102,6 +97,14 @@ public class LoginActivity extends AppCompatActivity {
         initialLoginState();
     }
 
+    private void showSnackbar(String message) {
+        View rootView = findViewById(android.R.id.content);
+        Snackbar snackbar = Snackbar.make(rootView, message, Snackbar.LENGTH_INDEFINITE);
+        snackbar.setActionTextColor(getResources().getColor(R.color.cyan_500));
+        snackbar.setAction("Close", v -> snackbar.dismiss());
+        snackbar.show();
+    }
+
     private void showLoginSnackbar() {
         View rootView = findViewById(android.R.id.content);
         Snackbar snackbar = Snackbar.make(rootView, "Login Successful", Snackbar.LENGTH_INDEFINITE);
@@ -114,9 +117,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void performLogin(String username, String password) {
-//        preferences.setLoggedIn(true);
         textUsernameLayout.setEnabled(false);
         textPasswordLayout.setEnabled(false);
+        registerButton.setEnabled(false);
         loginButton.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
         httpClient.login(new LoginCallback() {
@@ -134,10 +137,13 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                runOnUiThread(() -> {
-                    showErrorDialog(message);
-                });
+                runOnUiThread(() -> showErrorDialog(message));
             }
         }, username, password);
+    }
+
+    private void startRegisterActivity() {
+        Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
     }
 }
