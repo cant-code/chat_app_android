@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Eta Chat</string>
-    <!-- Strings related to login -->
+    <!-- Strings related to Login and Registration Forms -->
     <string name="prompt_email">Email</string>
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
@@ -16,4 +16,13 @@
     <string name="image_logo">Image Logo</string>
     <string name="sign_up_text">Don\'t have an account? Sign up</string>
     <string name="sign_in_text">Already have an account? Sign In</string>
+
+    <!-- Menu Strings -->
+    <string name="search">Search</string>
+    <string name="sort">Sort</string>
+    <string name="user_avatar">User Avatar</string>
+    <string name="logout">Logout</string>
+    <string name="title_activity_main">MainActivity</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

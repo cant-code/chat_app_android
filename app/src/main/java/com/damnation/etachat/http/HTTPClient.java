@@ -1,13 +1,16 @@
 package com.damnation.etachat.http;
 
 import android.util.Log;
+import com.damnation.etachat.token.Token;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -21,11 +24,37 @@ public class HTTPClient {
     private OkHttpClient client;
     private Gson gson;
     private Executor executor;
+    private Token token;
 
     private HTTPClient() {
         client = new OkHttpClient();
         gson = new Gson();
         executor = Executors.newFixedThreadPool(4);
+        token = Token.INSTANCE;
+    }
+
+    public List<User> loadUsers() {
+        Request request = new Request.Builder()
+                .get()
+                .url(BASE_URL + USERS)
+                .addHeader("Authorization", token.getToken())
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            ResponseBody responseBody = response.body();
+            if (responseBody != null) {
+                String json = responseBody.string();
+                Type type = new TypeToken<ArrayList<User>>(){}.getType();
+                List<User> userData = gson.fromJson(json, type);
+                if (userData != null) {
+                    return userData;
+                }
+            }
+        }
+        catch (IOException e) {
+            Log.e("UserHttp", "Error Loading Users", e);
+        }
+        return null;
     }
 
     public void login(LoginCallback callback, String username, String password) {
@@ -46,6 +75,7 @@ public class HTTPClient {
                 Type type = new TypeToken<HashMap<String, String>>(){}.getType();
                 assert responseBody != null;
                 String json = responseBody.string();
+                System.out.println(json);
                 HashMap<String, String> resp = gson.fromJson(json, type);
                 if(code == 404 || code == 400) {
                     callback.onError(resp.get("Error"));

@@ -48,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
             String tokenVal = preferences.getToken();
             String id = preferences.getId();
             token.setToken(tokenVal, id);
+            startMainActivity();
         }
 
         setContentView(R.layout.activity_login);
@@ -130,8 +131,9 @@ public class LoginActivity extends AppCompatActivity {
                     String tokenVal = map.get("token");
                     token.setToken(tokenVal, id);
                     System.out.println(id + " " + tokenVal);
-                    preferences.setLoggedIn(true, id, tokenVal);
+                    preferences.setLoggedIn(true, tokenVal, id);
                     showLoginSnackbar();
+                    startMainActivity();
                 });
             }
 
@@ -144,6 +146,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private void startRegisterActivity() {
         Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
+    }
+
+    private void startMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 }
