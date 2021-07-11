@@ -17,7 +17,7 @@ public class User implements Parcelable {
     private String email;
     private String username;
 
-    public User(String _id, String email, String username) {
+    public User(@NonNull String _id, String email, String username) {
         this._id = _id;
         this.email = email;
         this.username = username;
@@ -41,6 +41,7 @@ public class User implements Parcelable {
         }
     };
 
+    @NonNull
     public String get_id() {
         return this._id;
     }

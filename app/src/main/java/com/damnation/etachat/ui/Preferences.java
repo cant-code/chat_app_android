@@ -27,4 +27,8 @@ public class Preferences {
         preferences.edit().putString(ID, id).apply();
         preferences.edit().putBoolean(KEY_LOGIN_STATE, loggedIn).apply();
     }
+
+    public void logout() {
+        preferences.edit().clear().apply();
+    }
 }

@@ -1,5 +1,7 @@
 package com.damnation.etachat.ui;
 
+import android.content.Intent;
+import android.view.MenuItem;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
@@ -22,6 +24,18 @@ public class MainActivity extends AppCompatActivity {
         UserFragment userFragment = new UserFragment();
         GroupFragment groupFragment = new GroupFragment();
 
+        Preferences preferences = new Preferences(this);
+
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        MenuItem logout = toolbar.getMenu().findItem(R.id.logout);
+        logout.setOnMenuItemClickListener(item -> {
+            if(preferences.isLoggedIn()) {
+                preferences.logout();
+            }
+            startLoginActivity();
+            return true;
+        });
+
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this);
         sectionsPagerAdapter.addFragment(userFragment, "Users", R.drawable.ic_baseline_contacts_24);
         sectionsPagerAdapter.addFragment(groupFragment, "Chat Rooms", R.drawable.ic_baseline_forum_24);
@@ -32,5 +46,11 @@ public class MainActivity extends AppCompatActivity {
             tab.setText(sectionsPagerAdapter.getFragmentName(position));
             tab.setIcon(sectionsPagerAdapter.getIcon(position));
         }).attach();
+    }
+
+    private void startLoginActivity() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

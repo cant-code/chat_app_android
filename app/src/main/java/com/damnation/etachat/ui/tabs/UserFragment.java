@@ -3,9 +3,6 @@ package com.damnation.etachat.ui.tabs;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.SearchView;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,10 +73,7 @@ public class UserFragment extends Fragment {
     }
 
     private void loadDataFromDatabase() {
-        repository.loadDataFromDatabase(userList -> getActivity().runOnUiThread(() -> {
-            System.out.println(userList.getClass());
-            userAdapter.setData(userList);
-        }));
+        repository.loadDataFromDatabase(userList -> getActivity().runOnUiThread(() -> userAdapter.setData(userList)));
     }
 
     private void loadDataFromNetwork() {
