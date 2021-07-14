@@ -79,11 +79,11 @@ public class UserFragment extends Fragment {
     private void loadDataFromNetwork() {
         refreshLayout.setRefreshing(true);
 
-        repository.loadDataFromNetwork(new DataFromNetworkCallback() {
+        repository.loadDataFromNetwork(new DataFromNetworkCallback<User>() {
             @Override
-            public void onSuccess(List<User> blogList) {
+            public void onSuccess(List<User> userList) {
                 getActivity().runOnUiThread(() -> {
-                    userAdapter.setData(blogList);
+                    userAdapter.setData(userList);
                     refreshLayout.setRefreshing(false);
                 });
             }

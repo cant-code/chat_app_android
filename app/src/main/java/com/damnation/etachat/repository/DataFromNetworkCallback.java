@@ -4,7 +4,7 @@ import com.damnation.etachat.http.User;
 
 import java.util.List;
 
-public interface DataFromNetworkCallback {
-    void onSuccess(List<User> userList);
+public interface DataFromNetworkCallback<T> {
+    void onSuccess(List<T> list);
     void onError();
 }

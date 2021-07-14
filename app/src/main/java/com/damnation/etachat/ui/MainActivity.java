@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.view.MenuItem;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager2.widget.ViewPager2;
+import com.damnation.etachat.database.DatabaseProvider;
 import com.damnation.etachat.ui.tabs.GroupFragment;
 import com.damnation.etachat.R;
 import com.damnation.etachat.ui.tabs.UserFragment;
@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
             if(preferences.isLoggedIn()) {
                 preferences.logout();
             }
+            DatabaseProvider.getInstance(getApplicationContext()).userDAO().deleteAll();
             startLoginActivity();
             return true;
         });

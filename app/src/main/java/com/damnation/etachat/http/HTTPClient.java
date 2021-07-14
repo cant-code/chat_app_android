@@ -20,6 +20,7 @@ public class HTTPClient {
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     public static final String BASE_URL = "https://etachat.herokuapp.com/api";
     public static final String USERS = "/users";
+    public static final String GROUPS = "/group";
 
     private OkHttpClient client;
     private Gson gson;
@@ -31,6 +32,30 @@ public class HTTPClient {
         gson = new Gson();
         executor = Executors.newFixedThreadPool(4);
         token = Token.INSTANCE;
+    }
+
+    public List<Group> loadGroup() {
+        Request request = new Request.Builder()
+                .get()
+                .url(BASE_URL + GROUPS)
+                .addHeader("Authorization", token.getToken())
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            ResponseBody responseBody = response.body();
+            if(responseBody != null) {
+                String json = responseBody.string();
+                Type type = new TypeToken<ArrayList<Group>>(){}.getType();
+                List<Group> groupData = gson.fromJson(json, type);
+                if(groupData != null) {
+                    return groupData;
+                }
+            }
+        }
+        catch (IOException e) {
+            Log.e("GroupHttp", "Error loading groups", e);
+        }
+        return null;
     }
 
     public List<User> loadUsers() {
