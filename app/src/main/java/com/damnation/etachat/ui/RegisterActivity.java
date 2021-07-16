@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.damnation.etachat.R;
 import com.damnation.etachat.http.HTTPClient;
-import com.damnation.etachat.http.RegisterCallback;
+import com.damnation.etachat.http.CallBacks.RegisterCallback;
 import com.google.android.material.textfield.TextInputLayout;
 import org.jetbrains.annotations.NotNull;
 
@@ -67,7 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     @NotNull
-    static TextWatcher getTextWatcher(TextInputLayout textInputLayout) {
+    static public TextWatcher getTextWatcher(TextInputLayout textInputLayout) {
         return new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

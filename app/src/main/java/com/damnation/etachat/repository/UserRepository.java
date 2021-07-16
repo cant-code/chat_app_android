@@ -5,7 +5,9 @@ import com.damnation.etachat.database.AppDatabase;
 import com.damnation.etachat.database.UserDAO;
 import com.damnation.etachat.database.DatabaseProvider;
 import com.damnation.etachat.http.HTTPClient;
-import com.damnation.etachat.http.User;
+import com.damnation.etachat.model.User;
+import com.damnation.etachat.repository.CallBacks.DataFromDatabaseCallback;
+import com.damnation.etachat.repository.CallBacks.DataFromNetworkCallback;
 
 import java.util.List;
 import java.util.concurrent.Executor;

@@ -1,6 +1,4 @@
-package com.damnation.etachat.repository;
-
-import com.damnation.etachat.http.User;
+package com.damnation.etachat.repository.CallBacks;
 
 import java.util.List;
 

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import com.damnation.etachat.R;
-import com.damnation.etachat.http.Group;
+import com.damnation.etachat.model.Group;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +40,11 @@ public class GroupAdapter extends ListAdapter<Group, GroupAdapter.GroupAdapterVi
     public void setData(@Nullable List<Group> list) {
         originalList = list;
         super.submitList(list);
+    }
+
+    public void addData(@NonNull Group group) {
+        originalList.add(group);
+        super.submitList(originalList);
     }
 
     public void filter(String query) {

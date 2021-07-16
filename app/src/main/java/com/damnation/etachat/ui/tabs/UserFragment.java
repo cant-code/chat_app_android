@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.damnation.etachat.R;
 import com.damnation.etachat.adapter.UserAdapter;
-import com.damnation.etachat.http.User;
-import com.damnation.etachat.repository.DataFromNetworkCallback;
+import com.damnation.etachat.model.User;
+import com.damnation.etachat.repository.CallBacks.DataFromNetworkCallback;
 import com.damnation.etachat.repository.UserRepository;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
@@ -82,24 +82,20 @@ public class UserFragment extends Fragment {
         repository.loadDataFromNetwork(new DataFromNetworkCallback<User>() {
             @Override
             public void onSuccess(List<User> userList) {
-                getActivity().runOnUiThread(() -> {
                     userAdapter.setData(userList);
                     refreshLayout.setRefreshing(false);
-                });
             }
 
             @Override
             public void onError() {
-                getActivity().runOnUiThread(() -> {
                     refreshLayout.setRefreshing(false);
                     showErrorSnackbar();
-                });
             }
         });
     }
 
     private void showErrorSnackbar() {
-        View rootView = view.findViewById(android.R.id.content);
+        View rootView = getActivity().findViewById(android.R.id.content);
         Snackbar snackbar = Snackbar.make(rootView, "Error during loading users", Snackbar.LENGTH_INDEFINITE);
         snackbar.setActionTextColor(getResources().getColor(R.color.cyan_500));
         snackbar.setAction("Retry", v -> {

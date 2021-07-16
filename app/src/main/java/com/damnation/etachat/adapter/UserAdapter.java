@@ -3,7 +3,6 @@ package com.damnation.etachat.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -12,8 +11,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import com.damnation.etachat.R;
-import com.damnation.etachat.http.User;
-import org.jetbrains.annotations.NotNull;
+import com.damnation.etachat.model.User;
 
 import java.util.ArrayList;
 import java.util.List;

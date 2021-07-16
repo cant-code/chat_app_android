@@ -1,4 +1,4 @@
-package com.damnation.etachat.http;
+package com.damnation.etachat.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

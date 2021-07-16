@@ -1,4 +1,4 @@
-package com.damnation.etachat.http;
+package com.damnation.etachat.http.CallBacks;
 
 import java.util.HashMap;
 

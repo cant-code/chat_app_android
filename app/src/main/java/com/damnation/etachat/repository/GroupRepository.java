@@ -4,8 +4,11 @@ import android.content.Context;
 import com.damnation.etachat.database.AppDatabase;
 import com.damnation.etachat.database.DatabaseProvider;
 import com.damnation.etachat.database.GroupDAO;
-import com.damnation.etachat.http.Group;
+import com.damnation.etachat.model.Group;
 import com.damnation.etachat.http.HTTPClient;
+import com.damnation.etachat.repository.CallBacks.AddToDBCallback;
+import com.damnation.etachat.repository.CallBacks.DataFromDatabaseCallback;
+import com.damnation.etachat.repository.CallBacks.DataFromNetworkCallback;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -37,6 +40,19 @@ public class GroupRepository {
                 groupDAO.deleteAll();
                 groupDAO.insertAll(groupList);
                 callback.onSuccess(groupList);
+            }
+        });
+    }
+
+    public void addOrJoinRoom(AddToDBCallback<Group> callback, String name, String type) {
+        executor.execute(() -> {
+            Group group = httpClient.addOrJoinGroup(name, type);
+            if(group == null) {
+                callback.onError();
+            } else {
+                GroupDAO groupDAO = database.groupDAO();
+                groupDAO.insertOne(group);
+                callback.onSuccess(group);
             }
         });
     }

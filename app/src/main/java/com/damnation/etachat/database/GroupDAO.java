@@ -2,8 +2,9 @@ package com.damnation.etachat.database;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import com.damnation.etachat.http.Group;
+import com.damnation.etachat.model.Group;
 
 import java.util.List;
 
@@ -13,8 +14,11 @@ public interface GroupDAO {
     @Query("SELECT * FROM `group`")
     List<Group> getAll();
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<Group> groupList);
+
+    @Insert
+    void insertOne(Group group);
 
     @Query("DELETE FROM `group`")
     void deleteAll();

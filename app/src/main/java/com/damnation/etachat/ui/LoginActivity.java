@@ -11,7 +11,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.damnation.etachat.R;
 import com.damnation.etachat.http.HTTPClient;
-import com.damnation.etachat.http.LoginCallback;
+import com.damnation.etachat.http.CallBacks.LoginCallback;
 import com.damnation.etachat.token.Token;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;

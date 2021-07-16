@@ -14,6 +14,9 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -32,7 +35,8 @@ public class MainActivity extends AppCompatActivity {
             if(preferences.isLoggedIn()) {
                 preferences.logout();
             }
-            DatabaseProvider.getInstance(getApplicationContext()).userDAO().deleteAll();
+            Executor executor = Executors.newSingleThreadExecutor();
+            executor.execute(() ->  DatabaseProvider.getInstance(getApplicationContext()).userDAO().deleteAll());
             startLoginActivity();
             return true;
         });
