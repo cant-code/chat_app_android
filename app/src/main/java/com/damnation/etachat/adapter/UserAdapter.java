@@ -20,8 +20,15 @@ public class UserAdapter extends ListAdapter<User, UserAdapter.UserAdapterViewHo
 
     private List<User> originalList = new ArrayList<>();
 
-    public UserAdapter() {
+    public interface OnItemClickListener {
+        void onItemClicked(User user);
+    }
+
+    private OnItemClickListener clickListener;
+
+    public UserAdapter(OnItemClickListener clickListener) {
         super(DIFF_CALLBACK);
+        this.clickListener = clickListener;
     }
 
     @NonNull
@@ -29,7 +36,7 @@ public class UserAdapter extends ListAdapter<User, UserAdapter.UserAdapterViewHo
     public UserAdapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.item_main, parent, false);
-        return new UserAdapterViewHolder(view);
+        return new UserAdapterViewHolder(view, clickListener);
     }
 
     @Override
@@ -58,8 +65,9 @@ public class UserAdapter extends ListAdapter<User, UserAdapter.UserAdapterViewHo
         private ImageView imageView;
         private User user;
 
-        public UserAdapterViewHolder(@NonNull View itemView) {
+        public UserAdapterViewHolder(@NonNull View itemView, OnItemClickListener listener) {
             super(itemView);
+            itemView.setOnClickListener(v -> listener.onItemClicked(user));
             textView = itemView.findViewById(R.id.textName);
             imageView = itemView.findViewById(R.id.imageAvatar);
         }

@@ -15,6 +15,7 @@ import com.damnation.etachat.adapter.UserAdapter;
 import com.damnation.etachat.model.User;
 import com.damnation.etachat.repository.CallBacks.DataFromNetworkCallback;
 import com.damnation.etachat.repository.UserRepository;
+import com.damnation.etachat.ui.ChatActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -58,7 +59,7 @@ public class UserFragment extends Fragment {
             }
         });
 
-        userAdapter = new UserAdapter();
+        userAdapter = new UserAdapter(user -> ChatActivity.startChatActivity(getActivity(), user));
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(userAdapter);

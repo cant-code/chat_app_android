@@ -4,6 +4,7 @@ import android.util.Log;
 import com.damnation.etachat.http.CallBacks.LoginCallback;
 import com.damnation.etachat.http.CallBacks.RegisterCallback;
 import com.damnation.etachat.model.Group;
+import com.damnation.etachat.model.Messages;
 import com.damnation.etachat.model.User;
 import com.damnation.etachat.token.Token;
 import com.google.gson.Gson;
@@ -24,6 +25,7 @@ public class HTTPClient {
     public static final String BASE_URL = "https://etachat.herokuapp.com/api";
     public static final String USERS = "/users";
     public static final String GROUPS = "/group";
+    public static final String MESSAGES = "/messages";
 
     private OkHttpClient client;
     private Gson gson;
@@ -35,6 +37,30 @@ public class HTTPClient {
         gson = new Gson();
         executor = Executors.newFixedThreadPool(4);
         token = Token.INSTANCE;
+    }
+
+    public List<Messages> loadMessages(String id) {
+        Request request = new Request.Builder()
+                .get()
+                .url(BASE_URL + MESSAGES + "/convos/query?userId=" + id)
+                .addHeader("Authorization", token.getToken())
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            ResponseBody responseBody = response.body();
+            if (responseBody != null) {
+                String json = responseBody.string();
+                Type type = new TypeToken<ArrayList<Messages>>() {
+                }.getType();
+                List<Messages> messagesList = gson.fromJson(json, type);
+                if (messagesList != null) {
+                    return messagesList;
+                }
+            }
+        } catch (Exception e) {
+            Log.e("MessagesHttp", "Error loading messages", e);
+        }
+        return null;
     }
 
     public Group addOrJoinGroup(String name, String type) {

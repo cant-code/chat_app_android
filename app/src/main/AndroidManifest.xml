@@ -11,6 +11,8 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.EtaChat">
+        <activity android:name=".ui.ChatActivity">
+        </activity>
         <activity android:name=".ui.RegisterActivity">
         </activity>
         <activity android:name=".ui.MainActivity">

@@ -9,10 +9,4 @@
             app:actionViewClass="android.widget.SearchView"
             app:showAsAction="ifRoom"/>
 
-    <item
-            android:id="@+id/logout"
-            android:title="@string/logout"
-            android:icon="@drawable/ic_baseline_logout_24"
-            app:showAsAction="never"/>
-
 </menu>
