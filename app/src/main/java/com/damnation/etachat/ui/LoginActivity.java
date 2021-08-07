@@ -130,7 +130,6 @@ public class LoginActivity extends AppCompatActivity {
                     String id = map.get("id");
                     String tokenVal = map.get("token");
                     token.setToken(tokenVal, id);
-                    System.out.println(id + " " + tokenVal);
                     preferences.setLoggedIn(true, tokenVal, id);
                     showLoginSnackbar();
                     startMainActivity();

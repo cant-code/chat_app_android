@@ -85,13 +85,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@id/sendCard"
-                android:hint="@string/chat_box_hint">
+                app:placeholderText="@string/chat_box_hint"
+                android:layout_marginHorizontal="8dp"
+                app:boxCornerRadiusTopStart="32dp"
+                app:boxCornerRadiusTopEnd="32dp"
+                app:boxCornerRadiusBottomStart="32dp"
+                app:boxCornerRadiusBottomEnd="32dp">
 
             <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/messageInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
+                    android:maxLines="4"
+                    android:inputType="textMultiLine"
                     />
 
         </com.google.android.material.textfield.TextInputLayout>

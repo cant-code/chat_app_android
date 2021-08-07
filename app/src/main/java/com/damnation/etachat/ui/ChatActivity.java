@@ -2,9 +2,13 @@ package com.damnation.etachat.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.text.InputType;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,14 +20,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.damnation.etachat.R;
 import com.damnation.etachat.adapter.MessagesAdapter;
+import com.damnation.etachat.http.CallBacks.RegisterCallback;
+import com.damnation.etachat.http.HTTPClient;
 import com.damnation.etachat.model.Messages;
 import com.damnation.etachat.model.User;
 import com.damnation.etachat.repository.CallBacks.DataFromNetworkCallback;
 import com.damnation.etachat.repository.MessagesRepository;
 import com.damnation.etachat.token.Token;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
+
+import static com.damnation.etachat.ui.RegisterActivity.getTextWatcher;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -33,16 +42,18 @@ public class ChatActivity extends AppCompatActivity {
     private List<Messages> messagesList;
     private Token token;
     private User user;
+    private TextInputLayout messageInput;
+    private HTTPClient httpClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        httpClient = HTTPClient.INSTANCE;
         repository = new MessagesRepository(getApplicationContext());
 
         user = getIntent().getExtras().getParcelable("EXTRAS");
-
         ((TextView) findViewById(R.id.chat_name)).setText(user.getUsername());
 
         token = Token.INSTANCE;
@@ -73,6 +84,20 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        messageInput = findViewById(R.id.message);
+        messageInput.getEditText().setImeOptions(EditorInfo.IME_ACTION_SEND);
+        messageInput.getEditText().setRawInputType(InputType.TYPE_CLASS_TEXT);
+        messageInput.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+            boolean handled = false;
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                sendMessage();
+                handled = true;
+            }
+            return handled;
+        });
+        ImageButton sendButton = findViewById(R.id.send);
+        sendButton.setOnClickListener(v -> sendMessage());
+
         RecyclerView recyclerView = findViewById(R.id.chats);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
@@ -84,6 +109,27 @@ public class ChatActivity extends AppCompatActivity {
 
         loadDataFromNetwork();
         loadDataFromDatabase();
+
+        messageInput.getEditText().addTextChangedListener(getTextWatcher(messageInput));
+    }
+
+    public void sendMessage() {
+        String message = messageInput.getEditText().getText().toString();
+        if(message.isEmpty()) {
+            messageInput.setError("Message field cannot be empty");
+        } else {
+            httpClient.sendMessage(new RegisterCallback() {
+                @Override
+                public void onSuccess() {
+                    runOnUiThread(() -> messageInput.getEditText().getText().clear());
+                }
+
+                @Override
+                public void onError(String message) {
+                    genericSnackbar(message);
+                }
+            }, message, user.get_id());
+        }
     }
 
     public static void startChatActivity(Activity activity, User user) {
@@ -116,6 +162,13 @@ public class ChatActivity extends AppCompatActivity {
                 showErrorSnackbar();
             }
         }, user.get_id());
+    }
+
+    private void genericSnackbar(String message) {
+        View rootView = findViewById(android.R.id.content);
+        Snackbar snackbar = Snackbar.make(rootView, message, Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAction("Close", v -> snackbar.dismiss());
+        snackbar.show();
     }
 
     private void showErrorSnackbar() {

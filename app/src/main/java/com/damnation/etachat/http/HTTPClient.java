@@ -27,16 +27,47 @@ public class HTTPClient {
     public static final String GROUPS = "/group";
     public static final String MESSAGES = "/messages";
 
-    private OkHttpClient client;
-    private Gson gson;
-    private Executor executor;
-    private Token token;
+    private final OkHttpClient client;
+    private final Gson gson;
+    private final Executor executor;
+    private final Token token;
+    static Type type = new TypeToken<ArrayList<Group>>() {}.getType();
 
     private HTTPClient() {
         client = new OkHttpClient();
         gson = new Gson();
         executor = Executors.newFixedThreadPool(4);
         token = Token.INSTANCE;
+    }
+
+    public void sendMessage(RegisterCallback callback, String msg, String dest) {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("data", msg);
+        data.put("to", dest);
+        String post = gson.toJson(data);
+        RequestBody body = RequestBody.create(JSON, post);
+        Request request = new Request.Builder()
+                .post(body)
+                .url(BASE_URL + MESSAGES)
+                .addHeader("Authorization", token.getToken())
+                .build();
+        executor.execute(() -> {
+            try {
+                Response response = client.newCall(request).execute();
+                ResponseBody responseBody = response.body();
+                int code = response.code();
+                assert responseBody != null;
+                if (code == 404 || code == 500) {
+                    Log.e("SendMessageHttp", "Error sending message");
+                    callback.onError("Error sending message");
+                    return;
+                }
+                callback.onSuccess();
+            } catch (Exception e) {
+                Log.e("SendMessageHttp", "Error sending message", e);
+                callback.onError("Error sending message");
+            }
+        });
     }
 
     public List<Messages> loadMessages(String id) {
@@ -50,8 +81,7 @@ public class HTTPClient {
             ResponseBody responseBody = response.body();
             if (responseBody != null) {
                 String json = responseBody.string();
-                Type type = new TypeToken<ArrayList<Messages>>() {
-                }.getType();
+                Type type = new TypeToken<ArrayList<Messages>>() {}.getType();
                 List<Messages> messagesList = gson.fromJson(json, type);
                 if (messagesList != null) {
                     return messagesList;
@@ -80,7 +110,6 @@ public class HTTPClient {
             int code = response.code();
             assert responseBody != null;
             String json = responseBody.string();
-            System.out.println(json);
             if (code == 404 || code == 400) {
                 Log.e("GroupAddHttp", "Error joining or creating group");
                 return null;
@@ -106,8 +135,6 @@ public class HTTPClient {
             ResponseBody responseBody = response.body();
             if (responseBody != null) {
                 String json = responseBody.string();
-                Type type = new TypeToken<ArrayList<Group>>() {
-                }.getType();
                 List<Group> groupData = gson.fromJson(json, type);
                 if (groupData != null) {
                     return groupData;
@@ -130,8 +157,7 @@ public class HTTPClient {
             ResponseBody responseBody = response.body();
             if (responseBody != null) {
                 String json = responseBody.string();
-                Type type = new TypeToken<ArrayList<User>>() {
-                }.getType();
+                Type type = new TypeToken<ArrayList<User>>() {}.getType();
                 List<User> userData = gson.fromJson(json, type);
                 if (userData != null) {
                     return userData;
@@ -158,11 +184,8 @@ public class HTTPClient {
                 Response response = client.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 int code = response.code();
-                Type type = new TypeToken<HashMap<String, String>>() {
-                }.getType();
                 assert responseBody != null;
                 String json = responseBody.string();
-                System.out.println(json);
                 HashMap<String, String> resp = gson.fromJson(json, type);
                 if (code == 404 || code == 400) {
                     callback.onError(resp.get("Error"));
@@ -192,12 +215,9 @@ public class HTTPClient {
                 Response response = client.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 int code = response.code();
-                Type type = new TypeToken<HashMap<String, String>>() {
-                }.getType();
                 assert responseBody != null;
                 String json = responseBody.string();
                 HashMap<String, String> resp = gson.fromJson(json, type);
-                System.out.println(resp);
                 if (code == 404 || code == 400) {
                     callback.onError(resp.get("error"));
                     return;
