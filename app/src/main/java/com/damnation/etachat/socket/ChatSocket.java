@@ -7,7 +7,7 @@ import io.socket.client.Socket;
 import java.net.URISyntaxException;
 
 public class ChatSocket extends Application {
-    private static Socket mSocket;
+    private static Socket mSocket = null;
 
     public static Socket getmSocket() {
         if(mSocket == null) {

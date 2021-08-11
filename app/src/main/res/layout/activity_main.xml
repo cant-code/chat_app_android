@@ -18,7 +18,6 @@
                 android:layout_height="wrap_content"
                 app:title="@string/app_name"
                 app:menu="@menu/main_menu"
-                app:navigationIcon="@drawable/ic_baseline_menu_24"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 />
 

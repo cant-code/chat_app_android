@@ -23,7 +23,6 @@ public class MessagesAdapter extends ListAdapter<Messages, MessagesAdapter.Messa
     private static final int MESSAGE_SENT = 1;
     private static final int MESSAGE_RECEIVED = 2;
     private final String id;
-    private List<Messages> originalList = new ArrayList<>();
 
     public MessagesAdapter(String id) {
         super(DIFF_CALLBACK);
@@ -60,13 +59,12 @@ public class MessagesAdapter extends ListAdapter<Messages, MessagesAdapter.Messa
     }
 
     public void setData(@Nullable List<Messages> list) {
-        originalList = list;
         super.submitList(list);
     }
 
     public void filter(String query) {
         List<Messages> filteredList = new ArrayList<>();
-        for(Messages messages: originalList) {
+        for(Messages messages: getCurrentList()) {
             if(messages.getBody().toLowerCase().contains(query.toLowerCase())) {
                 filteredList.add(messages);
             }

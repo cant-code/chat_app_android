@@ -3,7 +3,6 @@ package com.damnation.etachat.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.text.InputType;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,10 +25,15 @@ import com.damnation.etachat.model.Messages;
 import com.damnation.etachat.model.User;
 import com.damnation.etachat.repository.CallBacks.DataFromNetworkCallback;
 import com.damnation.etachat.repository.MessagesRepository;
+import com.damnation.etachat.socket.ChatSocket;
 import com.damnation.etachat.token.Token;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.damnation.etachat.ui.RegisterActivity.getTextWatcher;
@@ -43,7 +47,10 @@ public class ChatActivity extends AppCompatActivity {
     private Token token;
     private User user;
     private TextInputLayout messageInput;
+    private RecyclerView recyclerView;
     private HTTPClient httpClient;
+    private Socket socket;
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +65,13 @@ public class ChatActivity extends AppCompatActivity {
 
         token = Token.INSTANCE;
         adapter = new MessagesAdapter(token.getId());
+
+        gson = new Gson();
+        socket = ChatSocket.getmSocket();
+        socket.on("messages", onNewMessage);
+        socket.connect();
+        String json = gson.toJson(token);
+        socket.emit("clientInfo", json);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());
@@ -98,7 +112,7 @@ public class ChatActivity extends AppCompatActivity {
         ImageButton sendButton = findViewById(R.id.send);
         sendButton.setOnClickListener(v -> sendMessage());
 
-        RecyclerView recyclerView = findViewById(R.id.chats);
+        recyclerView = findViewById(R.id.chats);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -112,6 +126,25 @@ public class ChatActivity extends AppCompatActivity {
 
         messageInput.getEditText().addTextChangedListener(getTextWatcher(messageInput));
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        socket.disconnect();
+        socket.off("messages", onNewMessage);
+    }
+
+    private final Emitter.Listener onNewMessage = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            runOnUiThread(() -> {
+                Messages messages = gson.fromJson(args[0].toString(), Messages.class);
+                messagesList.add(messages);
+                adapter.notifyItemInserted(messagesList.size() - 1);
+                recyclerView.scrollToPosition(messagesList.size() - 1);
+            });
+        }
+    };
 
     public void sendMessage() {
         String message = messageInput.getEditText().getText().toString();

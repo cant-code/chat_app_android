@@ -31,7 +31,7 @@ public class HTTPClient {
     private final Gson gson;
     private final Executor executor;
     private final Token token;
-    static Type type = new TypeToken<ArrayList<Group>>() {}.getType();
+    static Type type = new TypeToken<HashMap<String, String>>() {}.getType();
 
     private HTTPClient() {
         client = new OkHttpClient();
@@ -135,6 +135,7 @@ public class HTTPClient {
             ResponseBody responseBody = response.body();
             if (responseBody != null) {
                 String json = responseBody.string();
+                Type type = new TypeToken<ArrayList<Group>>() {}.getType();
                 List<Group> groupData = gson.fromJson(json, type);
                 if (groupData != null) {
                     return groupData;
@@ -193,6 +194,7 @@ public class HTTPClient {
                 }
                 callback.onSuccess(resp);
             } catch (Exception e) {
+                Log.e("t", "t", e);
                 callback.onError("An Error Occurred");
             }
         });
