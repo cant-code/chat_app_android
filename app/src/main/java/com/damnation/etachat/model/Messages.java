@@ -3,8 +3,12 @@ package com.damnation.etachat.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.NonNull;
+import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -17,13 +21,16 @@ public class Messages implements Parcelable {
     private String to;
     private String date;
     private String body;
+    @Embedded(prefix = "user_")
+    private User user;
 
-    public Messages(@NonNull String _id, String from, String to, String date, String body) {
+    public Messages(@NonNull String _id, String from, String to, String date, String body, User user) {
         this._id = _id;
         this.from = from;
         this.to = to;
         this.date = date;
         this.body = body;
+        this.user = user;
     }
 
     protected Messages(Parcel in) {
@@ -32,6 +39,7 @@ public class Messages implements Parcelable {
         to = in.readString();
         date = in.readString();
         body = in.readString();
+        user = in.readParcelable(User.class.getClassLoader());
     }
 
     public static final Creator<Messages> CREATOR = new Creator<Messages>() {
@@ -58,6 +66,7 @@ public class Messages implements Parcelable {
         dest.writeString(to);
         dest.writeString(date);
         dest.writeString(body);
+        dest.writeParcelable(user, 0);
     }
 
     @Override
@@ -112,5 +121,13 @@ public class Messages implements Parcelable {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

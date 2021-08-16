@@ -14,6 +14,9 @@ public interface MessagesDAO {
     @Query("SELECT * FROM messages WHERE (`to` = :toId AND `from` = :fromId) OR (`from` = :toId AND `to` = :fromId)")
     List<Messages> getAll(String toId, String fromId);
 
+    @Query("SELECT * FROM messages WHERE `to` IS NULL")
+    List<Messages> getGlobal();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<Messages> messagesList);
 

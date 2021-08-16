@@ -1,15 +1,19 @@
 package com.damnation.etachat.http;
 
 import android.util.Log;
+import androidx.annotation.NonNull;
 import com.damnation.etachat.http.CallBacks.LoginCallback;
 import com.damnation.etachat.http.CallBacks.RegisterCallback;
 import com.damnation.etachat.model.Group;
 import com.damnation.etachat.model.Messages;
+import com.damnation.etachat.model.MessagesDeserializer;
 import com.damnation.etachat.model.User;
 import com.damnation.etachat.token.Token;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -40,23 +44,23 @@ public class HTTPClient {
         token = Token.INSTANCE;
     }
 
-    public void sendMessage(RegisterCallback callback, String msg, String dest) {
+    public void sendMessage(RegisterCallback callback, @NonNull String msg, @NonNull String dest) {
         HashMap<String, String> data = new HashMap<>();
         data.put("data", msg);
-        data.put("to", dest);
         String post = gson.toJson(data);
         RequestBody body = RequestBody.create(JSON, post);
+        String url = BASE_URL + MESSAGES;
+        if (dest.equals("global")) url += "/global/";
+        else data.put("to", dest);
         Request request = new Request.Builder()
                 .post(body)
-                .url(BASE_URL + MESSAGES)
+                .url(url)
                 .addHeader("Authorization", token.getToken())
                 .build();
         executor.execute(() -> {
             try {
                 Response response = client.newCall(request).execute();
-                ResponseBody responseBody = response.body();
                 int code = response.code();
-                assert responseBody != null;
                 if (code == 404 || code == 500) {
                     Log.e("SendMessageHttp", "Error sending message");
                     callback.onError("Error sending message");
@@ -70,20 +74,28 @@ public class HTTPClient {
         });
     }
 
-    public List<Messages> loadMessages(String id) {
+    public List<Messages> getGlobalMessages() {
         Request request = new Request.Builder()
                 .get()
-                .url(BASE_URL + MESSAGES + "/convos/query?userId=" + id)
+                .url(BASE_URL + MESSAGES + "/global/")
                 .addHeader("Authorization", token.getToken())
                 .build();
+        return getMessages(request);
+    }
+
+    @Nullable
+    private List<Messages> getMessages(Request request) {
         try {
             Response response = client.newCall(request).execute();
             ResponseBody responseBody = response.body();
             if (responseBody != null) {
                 String json = responseBody.string();
+                GsonBuilder gsonBuilder = new GsonBuilder();
+                gsonBuilder.registerTypeAdapter(Messages.class, new MessagesDeserializer());
+                Gson customGson = gsonBuilder.create();
                 Type type = new TypeToken<ArrayList<Messages>>() {}.getType();
-                List<Messages> messagesList = gson.fromJson(json, type);
-                if (messagesList != null) {
+                List<Messages> messagesList = customGson.fromJson(json, type);
+                if (messagesList.size() > 0) {
                     return messagesList;
                 }
             }
@@ -91,6 +103,15 @@ public class HTTPClient {
             Log.e("MessagesHttp", "Error loading messages", e);
         }
         return null;
+    }
+
+    public List<Messages> loadMessages(String id) {
+        Request request = new Request.Builder()
+                .get()
+                .url(BASE_URL + MESSAGES + "/convos/query?userId=" + id)
+                .addHeader("Authorization", token.getToken())
+                .build();
+        return getMessages(request);
     }
 
     public Group addOrJoinGroup(String name, String type) {

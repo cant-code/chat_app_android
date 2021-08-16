@@ -3,9 +3,11 @@ package com.damnation.etachat.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,10 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MessagesAdapter extends ListAdapter<Messages, MessagesAdapter.MessagesSentAdapterViewHolder> {
+public class MessagesAdapter extends ListAdapter<Messages, RecyclerView.ViewHolder> {
 
     private static final int MESSAGE_SENT = 1;
     private static final int MESSAGE_RECEIVED = 2;
+    private static final int MESSAGE_GROUP = 3;
     private final String id;
 
     public MessagesAdapter(String id) {
@@ -34,6 +37,8 @@ public class MessagesAdapter extends ListAdapter<Messages, MessagesAdapter.Messa
         Messages messages = getItem(position);
         if(messages.getFrom().equals(id)) {
             return MESSAGE_SENT;
+        } else if(messages.getTo() == null) {
+            return MESSAGE_GROUP;
         } else {
             return MESSAGE_RECEIVED;
         }
@@ -42,20 +47,29 @@ public class MessagesAdapter extends ListAdapter<Messages, MessagesAdapter.Messa
     @NonNull
     @NotNull
     @Override
-    public MessagesSentAdapterViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view;
-        if (viewType == MESSAGE_SENT) {
-            view = inflater.inflate(R.layout.chat_item_self, parent, false);
-        } else {
-            view = inflater.inflate(R.layout.chat_item_other, parent, false);
+        switch (viewType) {
+            case MESSAGE_RECEIVED:
+                view = inflater.inflate(R.layout.chat_item_other, parent, false);
+                break;
+            case MESSAGE_GROUP:
+                view = inflater.inflate(R.layout.chat_item_group, parent, false);
+                return new MessagesGroupAdapterViewHolder(view);
+            default:
+                view = inflater.inflate(R.layout.chat_item_self, parent, false);
         }
         return new MessagesSentAdapterViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull MessagesSentAdapterViewHolder holder, int position) {
-        holder.bindTo(getItem(position));
+    public void onBindViewHolder(@NonNull @NotNull RecyclerView.ViewHolder holder, int position) {
+        if (holder.getItemViewType() == MESSAGE_GROUP) {
+            ((MessagesGroupAdapterViewHolder) holder).bindTo(getItem(position));
+        } else {
+            ((MessagesSentAdapterViewHolder) holder).bindTo(getItem(position));
+        }
     }
 
     public void setData(@Nullable List<Messages> list) {
@@ -70,6 +84,27 @@ public class MessagesAdapter extends ListAdapter<Messages, MessagesAdapter.Messa
             }
         }
         submitList(filteredList);
+    }
+
+    static class MessagesGroupAdapterViewHolder extends RecyclerView.ViewHolder {
+
+        private final TextView username, body, date;
+
+        public MessagesGroupAdapterViewHolder(@NonNull View itemView) {
+            super(itemView);
+            username = itemView.findViewById(R.id.username);
+            ConstraintLayout messageBody = itemView.findViewById(R.id.messageBody);
+            body = messageBody.findViewById(R.id.textName);
+            date = messageBody.findViewById(R.id.date);
+        }
+
+        void bindTo(Messages messages) {
+            body.setText(messages.getBody());
+            username.setText(messages.getUser().getUsername());
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a", Locale.ENGLISH);
+            String dateString = simpleDateFormat.format(Long.parseLong(messages.getDate()));
+            date.setText(dateString);
+        }
     }
 
     static class MessagesSentAdapterViewHolder extends RecyclerView.ViewHolder {

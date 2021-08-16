@@ -18,6 +18,7 @@ import com.damnation.etachat.model.Group;
 import com.damnation.etachat.repository.CallBacks.AddToDBCallback;
 import com.damnation.etachat.repository.CallBacks.DataFromNetworkCallback;
 import com.damnation.etachat.repository.GroupRepository;
+import com.damnation.etachat.ui.GroupChatActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
@@ -138,7 +139,7 @@ public class GroupFragment extends Fragment implements GroupActionAdapter.OnItem
                 launchDialog("Join");
                 break;
             case 2:
-                System.out.println("3");
+                GroupChatActivity.startGroupChatActivity(getActivity(), null);
                 break;
         }
     }

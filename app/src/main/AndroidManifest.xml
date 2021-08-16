@@ -10,8 +10,9 @@
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:usesCleartextTraffic="true"
             android:theme="@style/Theme.EtaChat">
+        <activity android:name=".ui.GroupChatActivity">
+        </activity>
         <activity android:name=".ui.ChatActivity">
         </activity>
         <activity android:name=".ui.RegisterActivity">

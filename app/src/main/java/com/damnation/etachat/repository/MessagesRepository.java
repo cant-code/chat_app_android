@@ -25,6 +25,23 @@ public class MessagesRepository {
         executor = Executors.newSingleThreadExecutor();
     }
 
+    public void loadGlobalDataFromDatabase(DataFromDatabaseCallback<Messages> callback) {
+        executor.execute(() -> callback.onSuccess(database.messagesDAO().getGlobal()));
+    }
+
+    public void loadGlobalDataFromNetwork(DataFromNetworkCallback<Messages> callback) {
+        executor.execute(() -> {
+            List<Messages> messagesList = httpClient.getGlobalMessages();
+            if(messagesList == null) {
+                callback.onError();
+            } else {
+                MessagesDAO messagesDAO = database.messagesDAO();
+                messagesDAO.insertAll(messagesList);
+                callback.onSuccess(messagesList);
+            }
+        });
+    }
+
     public void loadDataFromDatabase(DataFromDatabaseCallback<Messages> callback, String id, String from) {
         executor.execute(() -> callback.onSuccess(database.messagesDAO().getAll(id, from)));
     }
