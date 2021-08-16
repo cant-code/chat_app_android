@@ -26,6 +26,7 @@ public class MessagesAdapter extends ListAdapter<Messages, RecyclerView.ViewHold
     private static final int MESSAGE_RECEIVED = 2;
     private static final int MESSAGE_GROUP = 3;
     private final String id;
+    private List<Messages> originalList = new ArrayList<>();
 
     public MessagesAdapter(String id) {
         super(DIFF_CALLBACK);
@@ -73,12 +74,13 @@ public class MessagesAdapter extends ListAdapter<Messages, RecyclerView.ViewHold
     }
 
     public void setData(@Nullable List<Messages> list) {
+        originalList = list;
         super.submitList(list);
     }
 
     public void filter(String query) {
         List<Messages> filteredList = new ArrayList<>();
-        for(Messages messages: getCurrentList()) {
+        for(Messages messages: originalList) {
             if(messages.getBody().toLowerCase().contains(query.toLowerCase())) {
                 filteredList.add(messages);
             }

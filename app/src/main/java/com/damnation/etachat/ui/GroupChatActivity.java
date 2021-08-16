@@ -87,8 +87,7 @@ public class GroupChatActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                adapter.filter(query);
-                return true;
+                return false;
             }
 
             @Override
