@@ -2,12 +2,13 @@ package com.damnation.etachat.ui.tabs;
 
 import android.os.Bundle;
 import android.text.TextWatcher;
-import android.view.MenuItem;
-import android.widget.SearchView;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -120,7 +121,7 @@ public class GroupFragment extends Fragment implements GroupActionAdapter.OnItem
     private void showErrorSnackbar() {
         View rootView = getActivity().findViewById(android.R.id.content);
         Snackbar snackbar = Snackbar.make(rootView, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
-        snackbar.setActionTextColor(getResources().getColor(R.color.cyan_500));
+        snackbar.setActionTextColor(ContextCompat.getColor(getActivity().getApplicationContext(), R.color.cyan_500));
         snackbar.setAction("Retry", v -> {
             loadDataFromNetwork();
             snackbar.dismiss();

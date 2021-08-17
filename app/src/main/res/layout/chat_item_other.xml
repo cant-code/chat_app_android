@@ -29,6 +29,7 @@
                     android:layout_marginBottom="8dp"
                     android:paddingHorizontal="12dp"
                     android:paddingTop="8dp"
+                    android:textColor="@color/black"
                     style="@style/TextAppearance.MaterialComponents.Headline5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -1,12 +1,13 @@
 package com.damnation.etachat.ui.tabs;
 
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.widget.SearchView;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -32,6 +33,7 @@ public class UserFragment extends Fragment {
     private SwipeRefreshLayout refreshLayout;
     private UserRepository repository;
     private View view;
+    private List<User> usersList;
 
     public UserFragment() {}
 
@@ -74,7 +76,10 @@ public class UserFragment extends Fragment {
     }
 
     private void loadDataFromDatabase() {
-        repository.loadDataFromDatabase(userList -> getActivity().runOnUiThread(() -> userAdapter.setData(userList)));
+        repository.loadDataFromDatabase(userList -> {
+            usersList = userList;
+            getActivity().runOnUiThread(() -> userAdapter.setData(userList));
+        });
     }
 
     private void loadDataFromNetwork() {
@@ -83,14 +88,15 @@ public class UserFragment extends Fragment {
         repository.loadDataFromNetwork(new DataFromNetworkCallback<User>() {
             @Override
             public void onSuccess(List<User> userList) {
-                    userAdapter.setData(userList);
-                    refreshLayout.setRefreshing(false);
+                usersList = userList;
+                userAdapter.setData(userList);
+                refreshLayout.setRefreshing(false);
             }
 
             @Override
             public void onError() {
-                    refreshLayout.setRefreshing(false);
-                    showErrorSnackbar();
+                refreshLayout.setRefreshing(false);
+                showErrorSnackbar();
             }
         });
     }
@@ -98,7 +104,7 @@ public class UserFragment extends Fragment {
     private void showErrorSnackbar() {
         View rootView = getActivity().findViewById(android.R.id.content);
         Snackbar snackbar = Snackbar.make(rootView, "Error during loading users", Snackbar.LENGTH_INDEFINITE);
-        snackbar.setActionTextColor(getResources().getColor(R.color.cyan_500));
+        snackbar.setActionTextColor(ContextCompat.getColor(getActivity().getApplicationContext(), R.color.cyan_500));
         snackbar.setAction("Retry", v -> {
             loadDataFromNetwork();
             snackbar.dismiss();

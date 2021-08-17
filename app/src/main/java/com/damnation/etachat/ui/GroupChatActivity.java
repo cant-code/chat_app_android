@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -62,6 +63,7 @@ public class GroupChatActivity extends AppCompatActivity {
 
         group = getIntent().getExtras().getParcelable("EXTRAS");
         ((TextView) findViewById(R.id.chat_name)).setText(group.getUsername());
+        ((ImageView) findViewById(R.id.imageAvatar)).setImageResource(R.drawable.ic_baseline_group_24);
 
         Token token = Token.INSTANCE;
         adapter = new GroupMessagesAdapter(token.getId());

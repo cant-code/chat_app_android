@@ -9,11 +9,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -64,6 +66,9 @@ public class ChatActivity extends AppCompatActivity {
         user = getIntent().getExtras().getParcelable("EXTRAS");
         isGlobal = user == null;
         ((TextView) findViewById(R.id.chat_name)).setText(isGlobal ? "Global Chat" : user.getUsername());
+        if(isGlobal) {
+            ((ImageView) findViewById(R.id.imageAvatar)).setImageResource(R.drawable.ic_baseline_public_24);
+        }
 
         token = Token.INSTANCE;
         adapter = new MessagesAdapter(token.getId());
@@ -236,7 +241,7 @@ public class ChatActivity extends AppCompatActivity {
     private void showErrorSnackbar() {
         View rootView = findViewById(android.R.id.content);
         Snackbar snackbar = Snackbar.make(rootView, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
-        snackbar.setActionTextColor(getResources().getColor(R.color.cyan_500));
+        snackbar.setActionTextColor(ContextCompat.getColor(getApplicationContext(), R.color.cyan_500));
         snackbar.setAction("Retry", v -> {
             loadDataFromNetwork();
             snackbar.dismiss();
