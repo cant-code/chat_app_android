@@ -18,6 +18,7 @@ import com.damnation.etachat.model.Group;
 import com.damnation.etachat.repository.CallBacks.AddToDBCallback;
 import com.damnation.etachat.repository.CallBacks.DataFromNetworkCallback;
 import com.damnation.etachat.repository.GroupRepository;
+import com.damnation.etachat.ui.ChatActivity;
 import com.damnation.etachat.ui.GroupChatActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -68,7 +69,7 @@ public class GroupFragment extends Fragment implements GroupActionAdapter.OnItem
             }
         });
 
-        groupAdapter = new GroupAdapter();
+        groupAdapter = new GroupAdapter(group -> GroupChatActivity.startGroupChatActivity(getActivity(), group));
         GroupActionAdapter groupActionAdapter = new GroupActionAdapter(this);
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -139,7 +140,7 @@ public class GroupFragment extends Fragment implements GroupActionAdapter.OnItem
                 launchDialog("Join");
                 break;
             case 2:
-                GroupChatActivity.startGroupChatActivity(getActivity(), null);
+                ChatActivity.startChatActivity(getActivity(), null);
                 break;
         }
     }

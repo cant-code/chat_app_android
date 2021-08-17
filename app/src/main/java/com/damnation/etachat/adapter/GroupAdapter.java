@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import com.damnation.etachat.R;
 import com.damnation.etachat.model.Group;
+import com.damnation.etachat.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,15 @@ public class GroupAdapter extends ListAdapter<Group, GroupAdapter.GroupAdapterVi
 
     private List<Group> originalList = new ArrayList<>();
 
-    public GroupAdapter() {
+    public interface OnItemClickListener {
+        void onItemClicked(Group group);
+    }
+
+    private GroupAdapter.OnItemClickListener clickListener;
+
+    public GroupAdapter(GroupAdapter.OnItemClickListener clickListener) {
         super(DIFF_CALLBACK);
+        this.clickListener = clickListener;
     }
 
     @NonNull
@@ -29,7 +37,7 @@ public class GroupAdapter extends ListAdapter<Group, GroupAdapter.GroupAdapterVi
     public GroupAdapter.GroupAdapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.item_main, parent, false);
-        return new GroupAdapter.GroupAdapterViewHolder(view);
+        return new GroupAdapter.GroupAdapterViewHolder(view, clickListener);
     }
 
     @Override
@@ -63,8 +71,9 @@ public class GroupAdapter extends ListAdapter<Group, GroupAdapter.GroupAdapterVi
         private ImageView imageView;
         private Group group;
 
-        public GroupAdapterViewHolder(@NonNull View itemView) {
+        public GroupAdapterViewHolder(@NonNull View itemView, OnItemClickListener listener) {
             super(itemView);
+            itemView.setOnClickListener(v -> listener.onItemClicked(group));
             textView = itemView.findViewById(R.id.textName);
             imageView = itemView.findViewById(R.id.imageAvatar);
         }

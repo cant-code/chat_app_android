@@ -6,10 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverters;
-import com.damnation.etachat.database.StringListTypeConvertor;
 
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -19,13 +16,10 @@ public class Group implements Parcelable {
     @NonNull
     private String _id;
     private String username;
-    @TypeConverters(StringListTypeConvertor.class)
-    private List<String> users;
 
-    public Group(@NonNull String _id, String username, List<String> users) {
+    public Group(@NonNull String _id, String username) {
         this._id = _id;
         this.username = username;
-        this.users = users;
     }
 
     @Override
@@ -34,26 +28,23 @@ public class Group implements Parcelable {
         if(o == null || getClass() != o.getClass()) return false;
         Group group = (Group) o;
         return Objects.equals(_id, group._id) &&
-                Objects.equals(username, group.username) &&
-                Objects.equals(users, group.users);
+                Objects.equals(username, group.username);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(_id, username, users);
+        return Objects.hash(_id, username);
     }
 
     protected Group(Parcel in) {
         _id = in.readString();
         username = in.readString();
-        in.readList(users, String.class.getClassLoader());
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(_id);
         dest.writeString(username);
-        dest.writeList(users);
     }
 
     @Override
@@ -80,9 +71,5 @@ public class Group implements Parcelable {
 
     public String getUsername() {
         return username;
-    }
-
-    public List<String> getUsers() {
-        return users;
     }
 }

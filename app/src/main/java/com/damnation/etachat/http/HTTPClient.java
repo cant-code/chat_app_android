@@ -4,10 +4,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import com.damnation.etachat.http.CallBacks.LoginCallback;
 import com.damnation.etachat.http.CallBacks.RegisterCallback;
-import com.damnation.etachat.model.Group;
-import com.damnation.etachat.model.Messages;
-import com.damnation.etachat.model.MessagesDeserializer;
-import com.damnation.etachat.model.User;
+import com.damnation.etachat.model.*;
+import com.damnation.etachat.model.deserializers.GroupMessagesDeserializer;
+import com.damnation.etachat.model.deserializers.MessagesDeserializer;
 import com.damnation.etachat.token.Token;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -19,6 +18,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -44,14 +44,40 @@ public class HTTPClient {
         token = Token.INSTANCE;
     }
 
+    public List<GroupMessages> getGroupMessages(String id) {
+        Request request = new Request.Builder()
+                .get()
+                .url(BASE_URL + GROUPS + "/query?group=" + id)
+                .addHeader("Authorization", token.getToken())
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            ResponseBody responseBody = response.body();
+            if (responseBody != null) {
+                String json = responseBody.string();
+                GsonBuilder gsonBuilder = new GsonBuilder();
+                gsonBuilder.registerTypeAdapter(GroupMessages.class, new GroupMessagesDeserializer());
+                Gson customGson = gsonBuilder.create();
+                Type type = new TypeToken<ArrayList<GroupMessages>>() {}.getType();
+                List<GroupMessages> messagesList = customGson.fromJson(json, type);
+                if (messagesList.size() > 0) {
+                    return messagesList;
+                }
+            }
+        } catch (Exception e) {
+            Log.e("GroupMessagesHttp", "Error loading messages", e);
+        }
+        return null;
+    }
+
     public void sendMessage(RegisterCallback callback, @NonNull String msg, @NonNull String dest) {
         HashMap<String, String> data = new HashMap<>();
         data.put("data", msg);
+        String url = BASE_URL + MESSAGES + "/";
+        if (dest.equals("global")) url += "global/";
+        else data.put("to", dest);
         String post = gson.toJson(data);
         RequestBody body = RequestBody.create(JSON, post);
-        String url = BASE_URL + MESSAGES;
-        if (dest.equals("global")) url += "/global/";
-        else data.put("to", dest);
         Request request = new Request.Builder()
                 .post(body)
                 .url(url)
@@ -66,6 +92,7 @@ public class HTTPClient {
                     callback.onError("Error sending message");
                     return;
                 }
+                Objects.requireNonNull(response.body()).close();
                 callback.onSuccess();
             } catch (Exception e) {
                 Log.e("SendMessageHttp", "Error sending message", e);
@@ -101,8 +128,9 @@ public class HTTPClient {
             }
         } catch (Exception e) {
             Log.e("MessagesHttp", "Error loading messages", e);
+            return null;
         }
-        return null;
+        return new ArrayList<>();
     }
 
     public List<Messages> loadMessages(String id) {
@@ -215,7 +243,7 @@ public class HTTPClient {
                 }
                 callback.onSuccess(resp);
             } catch (Exception e) {
-                Log.e("t", "t", e);
+                Log.e("LoginError", "Error logging in", e);
                 callback.onError("An Error Occurred");
             }
         });

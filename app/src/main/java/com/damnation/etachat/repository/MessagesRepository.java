@@ -3,8 +3,10 @@ package com.damnation.etachat.repository;
 import android.content.Context;
 import com.damnation.etachat.database.AppDatabase;
 import com.damnation.etachat.database.DatabaseProvider;
+import com.damnation.etachat.database.GroupMessagesDAO;
 import com.damnation.etachat.database.MessagesDAO;
 import com.damnation.etachat.http.HTTPClient;
+import com.damnation.etachat.model.GroupMessages;
 import com.damnation.etachat.model.Messages;
 import com.damnation.etachat.repository.CallBacks.DataFromDatabaseCallback;
 import com.damnation.etachat.repository.CallBacks.DataFromNetworkCallback;
@@ -54,6 +56,23 @@ public class MessagesRepository {
             } else {
                 MessagesDAO messagesDAO = database.messagesDAO();
                 messagesDAO.insertAll(messagesList);
+                callback.onSuccess(messagesList);
+            }
+        });
+    }
+
+    public void loadGroupDataFromDatabase(DataFromDatabaseCallback<GroupMessages> callback, String groupId) {
+        executor.execute(() -> callback.onSuccess(database.groupMessagesDAO().getAll(groupId)));
+    }
+
+    public void loadGroupDataFromNetwork(DataFromNetworkCallback<GroupMessages> callback, String groupId) {
+        executor.execute(() -> {
+            List<GroupMessages> messagesList = httpClient.getGroupMessages(groupId);
+            if(messagesList == null) {
+                callback.onError();
+            } else {
+                GroupMessagesDAO groupMessagesDAO = database.groupMessagesDAO();
+                groupMessagesDAO.insertAll(messagesList);
                 callback.onSuccess(messagesList);
             }
         });

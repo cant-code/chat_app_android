@@ -18,11 +18,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.damnation.etachat.R;
-import com.damnation.etachat.adapter.MessagesAdapter;
+import com.damnation.etachat.adapter.GroupMessagesAdapter;
 import com.damnation.etachat.http.CallBacks.RegisterCallback;
 import com.damnation.etachat.http.HTTPClient;
 import com.damnation.etachat.model.Group;
-import com.damnation.etachat.model.Messages;
+import com.damnation.etachat.model.GroupMessages;
 import com.damnation.etachat.repository.CallBacks.DataFromNetworkCallback;
 import com.damnation.etachat.repository.MessagesRepository;
 import com.damnation.etachat.socket.ChatSocket;
@@ -39,10 +39,10 @@ import static com.damnation.etachat.ui.RegisterActivity.getTextWatcher;
 
 public class GroupChatActivity extends AppCompatActivity {
 
-    private MessagesAdapter adapter;
+    private GroupMessagesAdapter adapter;
     private SwipeRefreshLayout refreshLayout;
     private MessagesRepository repository;
-    private List<Messages> messagesList;
+    private List<GroupMessages> messagesList;
     private Token token;
     private Group group;
     private TextInputLayout messageInput;
@@ -60,10 +60,10 @@ public class GroupChatActivity extends AppCompatActivity {
         repository = new MessagesRepository(getApplicationContext());
 
         group = getIntent().getExtras().getParcelable("EXTRAS");
-        ((TextView) findViewById(R.id.chat_name)).setText(group != null ? group.getUsername() : "Global Chat");
+        ((TextView) findViewById(R.id.chat_name)).setText(group.getUsername());
 
         token = Token.INSTANCE;
-        adapter = new MessagesAdapter(token.getId());
+        adapter = new GroupMessagesAdapter(token.getId());
 
         gson = new Gson();
         socket = ChatSocket.getmSocket();
@@ -71,7 +71,7 @@ public class GroupChatActivity extends AppCompatActivity {
         socket.connect();
         String json = gson.toJson(token);
         socket.emit("clientInfo", json);
-        socket.emit("joingroup", "global");
+        socket.emit("joingroup", group.get_id());
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());
@@ -110,6 +110,7 @@ public class GroupChatActivity extends AppCompatActivity {
         });
         ImageButton sendButton = findViewById(R.id.send);
         sendButton.setOnClickListener(v -> sendMessage());
+        sendButton.setEnabled(false);
 
         recyclerView = findViewById(R.id.chats);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -137,7 +138,7 @@ public class GroupChatActivity extends AppCompatActivity {
         @Override
         public void call(Object... args) {
             runOnUiThread(() -> {
-                Messages messages = gson.fromJson(args[0].toString(), Messages.class);
+                GroupMessages messages = gson.fromJson(args[0].toString(), GroupMessages.class);
                 messagesList.add(messages);
                 adapter.notifyItemInserted(messagesList.size() - 1);
                 recyclerView.scrollToPosition(messagesList.size() - 1);
@@ -160,7 +161,7 @@ public class GroupChatActivity extends AppCompatActivity {
                 public void onError(String message) {
                     genericSnackbar(message);
                 }
-            }, message, "global");
+            }, message, group.get_id());
         }
     }
 
@@ -171,18 +172,17 @@ public class GroupChatActivity extends AppCompatActivity {
     }
 
     private void loadDataFromDatabase() {
-        repository.loadGlobalDataFromDatabase(list -> {
+        repository.loadGroupDataFromDatabase(list -> {
             messagesList = list;
             runOnUiThread(() -> adapter.setData(list));
-        });
+        }, group.get_id());
     }
 
     private void loadDataFromNetwork() {
         refreshLayout.setRefreshing(true);
-
-        repository.loadGlobalDataFromNetwork(new DataFromNetworkCallback<Messages>() {
+        repository.loadGroupDataFromNetwork(new DataFromNetworkCallback<GroupMessages>() {
             @Override
-            public void onSuccess(List<Messages> list) {
+            public void onSuccess(List<GroupMessages> list) {
                 messagesList = list;
                 runOnUiThread(() -> adapter.setData(list));
                 refreshLayout.setRefreshing(false);
@@ -193,7 +193,7 @@ public class GroupChatActivity extends AppCompatActivity {
                 refreshLayout.setRefreshing(false);
                 showErrorSnackbar();
             }
-        });
+        }, group.get_id());
     }
 
     private void genericSnackbar(String message) {

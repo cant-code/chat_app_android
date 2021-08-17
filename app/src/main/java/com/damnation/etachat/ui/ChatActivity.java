@@ -51,6 +51,7 @@ public class ChatActivity extends AppCompatActivity {
     private HTTPClient httpClient;
     private Socket socket;
     private Gson gson;
+    private boolean isGlobal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,8 @@ public class ChatActivity extends AppCompatActivity {
         repository = new MessagesRepository(getApplicationContext());
 
         user = getIntent().getExtras().getParcelable("EXTRAS");
-        ((TextView) findViewById(R.id.chat_name)).setText(user.getUsername());
+        isGlobal = user == null;
+        ((TextView) findViewById(R.id.chat_name)).setText(isGlobal ? "Global Chat" : user.getUsername());
 
         token = Token.INSTANCE;
         adapter = new MessagesAdapter(token.getId());
@@ -72,6 +74,7 @@ public class ChatActivity extends AppCompatActivity {
         socket.connect();
         String json = gson.toJson(token);
         socket.emit("clientInfo", json);
+        if (isGlobal) socket.emit("joingroup", "global");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());
@@ -160,7 +163,7 @@ public class ChatActivity extends AppCompatActivity {
                 public void onError(String message) {
                     genericSnackbar(message);
                 }
-            }, message, user.get_id());
+            }, message, isGlobal ? "global" : user.get_id());
         }
     }
 
@@ -171,29 +174,53 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void loadDataFromDatabase() {
-        repository.loadDataFromDatabase(list -> {
-            messagesList = list;
-            runOnUiThread(() -> adapter.setData(list));
-        }, user.get_id(), token.getId());
+        if (isGlobal) {
+            repository.loadGlobalDataFromDatabase(list -> {
+                messagesList = list;
+                runOnUiThread(() -> adapter.setData(list));
+            });
+        } else {
+            repository.loadDataFromDatabase(list -> {
+                messagesList = list;
+                runOnUiThread(() -> adapter.setData(list));
+            }, user.get_id(), token.getId());
+        }
     }
 
     private void loadDataFromNetwork() {
         refreshLayout.setRefreshing(true);
 
-        repository.loadDataFromNetwork(new DataFromNetworkCallback<Messages>() {
-            @Override
-            public void onSuccess(List<Messages> list) {
-                messagesList = list;
-                runOnUiThread(() -> adapter.setData(list));
-                refreshLayout.setRefreshing(false);
-            }
+        if (isGlobal) {
+            repository.loadGlobalDataFromNetwork(new DataFromNetworkCallback<Messages>() {
+                @Override
+                public void onSuccess(List<Messages> list) {
+                    messagesList = list;
+                    runOnUiThread(() -> adapter.setData(list));
+                    refreshLayout.setRefreshing(false);
+                }
 
-            @Override
-            public void onError() {
-                refreshLayout.setRefreshing(false);
-                showErrorSnackbar();
-            }
-        }, user.get_id());
+                @Override
+                public void onError() {
+                    refreshLayout.setRefreshing(false);
+                    showErrorSnackbar();
+                }
+            });
+        } else {
+            repository.loadDataFromNetwork(new DataFromNetworkCallback<Messages>() {
+                @Override
+                public void onSuccess(List<Messages> list) {
+                    messagesList = list;
+                    runOnUiThread(() -> adapter.setData(list));
+                    refreshLayout.setRefreshing(false);
+                }
+
+                @Override
+                public void onError() {
+                    refreshLayout.setRefreshing(false);
+                    showErrorSnackbar();
+                }
+            }, user.get_id());
+        }
     }
 
     private void genericSnackbar(String message) {

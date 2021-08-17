@@ -10,47 +10,35 @@ import androidx.room.PrimaryKey;
 import java.util.Objects;
 
 @Entity
-public class Messages implements Parcelable {
+public class GroupMessages implements Parcelable {
 
     @PrimaryKey
     @NonNull
     private String _id;
     private String from;
-    private String to;
+    private String group;
     private String date;
     private String body;
     @Embedded(prefix = "user_")
     private User user;
 
-    public Messages(@NonNull String _id, String from, String to, String date, String body, User user) {
-        this._id = _id;
-        this.from = from;
-        this.to = to;
-        this.date = date;
-        this.body = body;
-        this.user = user;
-    }
-
-    protected Messages(Parcel in) {
+    protected GroupMessages(Parcel in) {
         _id = in.readString();
         from = in.readString();
-        to = in.readString();
+        group = in.readString();
         date = in.readString();
         body = in.readString();
         user = in.readParcelable(User.class.getClassLoader());
     }
 
-    public static final Creator<Messages> CREATOR = new Creator<Messages>() {
-        @Override
-        public Messages createFromParcel(Parcel in) {
-            return new Messages(in);
-        }
-
-        @Override
-        public Messages[] newArray(int size) {
-            return new Messages[size];
-        }
-    };
+    public GroupMessages(@NonNull String _id, String from, String group, String date, String body, User user) {
+        this._id = _id;
+        this.from = from;
+        this.group = group;
+        this.date = date;
+        this.body = body;
+        this.user = user;
+    }
 
     @Override
     public int describeContents() {
@@ -61,24 +49,23 @@ public class Messages implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(_id);
         dest.writeString(from);
-        dest.writeString(to);
+        dest.writeString(group);
         dest.writeString(date);
         dest.writeString(body);
         dest.writeParcelable(user, 0);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Messages messages = (Messages) o;
-        return _id.equals(messages._id) && Objects.equals(from, messages.from) && Objects.equals(to, messages.to) && Objects.equals(date, messages.date) && Objects.equals(body, messages.body);
-    }
+    public static final Creator<GroupMessages> CREATOR = new Creator<GroupMessages>() {
+        @Override
+        public GroupMessages createFromParcel(Parcel in) {
+            return new GroupMessages(in);
+        }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(_id, from, to, date, body);
-    }
+        @Override
+        public GroupMessages[] newArray(int size) {
+            return new GroupMessages[size];
+        }
+    };
 
     @NonNull
     public String get_id() {
@@ -97,12 +84,12 @@ public class Messages implements Parcelable {
         this.from = from;
     }
 
-    public String getTo() {
-        return to;
+    public String getGroup() {
+        return group;
     }
 
-    public void setTo(String to) {
-        this.to = to;
+    public void setGroup(String group) {
+        this.group = group;
     }
 
     public String getDate() {
@@ -127,5 +114,18 @@ public class Messages implements Parcelable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GroupMessages that = (GroupMessages) o;
+        return _id.equals(that._id) && Objects.equals(from, that.from) && Objects.equals(group, that.group) && Objects.equals(date, that.date) && Objects.equals(body, that.body) && Objects.equals(user, that.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_id, from, group, date, body, user);
     }
 }
