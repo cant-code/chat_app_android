@@ -14,13 +14,13 @@ public class GroupMessages implements Parcelable {
 
     @PrimaryKey
     @NonNull
-    private String _id;
-    private String from;
-    private String group;
-    private String date;
-    private String body;
+    private final String _id;
+    private final String from;
+    private final String group;
+    private final String date;
+    private final String body;
     @Embedded(prefix = "user_")
-    private User user;
+    private final User user;
 
     protected GroupMessages(Parcel in) {
         _id = in.readString();
@@ -72,48 +72,24 @@ public class GroupMessages implements Parcelable {
         return _id;
     }
 
-    public void set_id(@NonNull String _id) {
-        this._id = _id;
-    }
-
     public String getFrom() {
         return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
     }
 
     public String getGroup() {
         return group;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
-    }
-
     public String getDate() {
         return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public String getBody() {
         return body;
     }
 
-    public void setBody(String body) {
-        this.body = body;
-    }
-
     public User getUser() {
         return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     @Override

@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import com.damnation.etachat.R;
 import com.damnation.etachat.model.Group;
-import com.damnation.etachat.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ public class GroupAdapter extends ListAdapter<Group, GroupAdapter.GroupAdapterVi
         void onItemClicked(Group group);
     }
 
-    private GroupAdapter.OnItemClickListener clickListener;
+    private final GroupAdapter.OnItemClickListener clickListener;
 
     public GroupAdapter(GroupAdapter.OnItemClickListener clickListener) {
         super(DIFF_CALLBACK);
@@ -67,8 +66,8 @@ public class GroupAdapter extends ListAdapter<Group, GroupAdapter.GroupAdapterVi
 
     static class GroupAdapterViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView textView;
-        private ImageView imageView;
+        private final TextView textView;
+        private final ImageView imageView;
         private Group group;
 
         public GroupAdapterViewHolder(@NonNull View itemView, OnItemClickListener listener) {

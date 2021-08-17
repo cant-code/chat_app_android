@@ -22,7 +22,4 @@ public interface MessagesDAO {
 
     @Insert
     void insertOne(Messages messages);
-
-    @Query("DELETE FROM messages")
-    void deleteAll();
 }

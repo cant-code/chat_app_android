@@ -32,7 +32,6 @@ public class UserFragment extends Fragment {
     private UserAdapter userAdapter;
     private SwipeRefreshLayout refreshLayout;
     private UserRepository repository;
-    private View view;
     private List<User> usersList;
 
     public UserFragment() {}
@@ -41,7 +40,7 @@ public class UserFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_user, container, false);
+        View view = inflater.inflate(R.layout.fragment_user, container, false);
 
         repository = new UserRepository(view.getContext().getApplicationContext());
 

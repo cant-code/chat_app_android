@@ -14,13 +14,13 @@ public class Messages implements Parcelable {
 
     @PrimaryKey
     @NonNull
-    private String _id;
-    private String from;
-    private String to;
-    private String date;
-    private String body;
+    private final String _id;
+    private final String from;
+    private final String to;
+    private final String date;
+    private final String body;
     @Embedded(prefix = "user_")
-    private User user;
+    private final User user;
 
     public Messages(@NonNull String _id, String from, String to, String date, String body, User user) {
         this._id = _id;
@@ -85,47 +85,23 @@ public class Messages implements Parcelable {
         return _id;
     }
 
-    public void set_id(@NonNull String _id) {
-        this._id = _id;
-    }
-
     public String getFrom() {
         return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
     }
 
     public String getTo() {
         return to;
     }
 
-    public void setTo(String to) {
-        this.to = to;
-    }
-
     public String getDate() {
         return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public String getBody() {
         return body;
     }
 
-    public void setBody(String body) {
-        this.body = body;
-    }
-
     public User getUser() {
         return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }

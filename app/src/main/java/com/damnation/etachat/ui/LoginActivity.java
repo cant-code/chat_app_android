@@ -9,9 +9,10 @@ import android.widget.ProgressBar;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import com.damnation.etachat.R;
-import com.damnation.etachat.http.HTTPClient;
 import com.damnation.etachat.http.CallBacks.LoginCallback;
+import com.damnation.etachat.http.HTTPClient;
 import com.damnation.etachat.token.Token;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
@@ -101,7 +102,7 @@ public class LoginActivity extends AppCompatActivity {
     private void showSnackbar(String message) {
         View rootView = findViewById(android.R.id.content);
         Snackbar snackbar = Snackbar.make(rootView, message, Snackbar.LENGTH_INDEFINITE);
-        snackbar.setActionTextColor(getResources().getColor(R.color.cyan_500));
+        snackbar.setActionTextColor(ContextCompat.getColor(getApplicationContext(), R.color.cyan_500));
         snackbar.setAction("Close", v -> snackbar.dismiss());
         snackbar.show();
     }
@@ -109,7 +110,7 @@ public class LoginActivity extends AppCompatActivity {
     private void showLoginSnackbar() {
         View rootView = findViewById(android.R.id.content);
         Snackbar snackbar = Snackbar.make(rootView, "Login Successful", Snackbar.LENGTH_INDEFINITE);
-        snackbar.setActionTextColor(getResources().getColor(R.color.cyan_500));
+        snackbar.setActionTextColor(ContextCompat.getColor(getApplicationContext(), R.color.cyan_500));
         snackbar.setAction("Close", v -> {
             snackbar.dismiss();
             initialLoginState();

@@ -19,7 +19,4 @@ public interface GroupMessagesDAO {
 
     @Insert
     void insertOne(GroupMessages messages);
-
-    @Query("DELETE FROM groupmessages")
-    void deleteAll();
 }

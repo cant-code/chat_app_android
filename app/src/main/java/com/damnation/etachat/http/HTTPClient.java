@@ -4,7 +4,10 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import com.damnation.etachat.http.CallBacks.LoginCallback;
 import com.damnation.etachat.http.CallBacks.RegisterCallback;
-import com.damnation.etachat.model.*;
+import com.damnation.etachat.model.Group;
+import com.damnation.etachat.model.GroupMessages;
+import com.damnation.etachat.model.Messages;
+import com.damnation.etachat.model.User;
 import com.damnation.etachat.model.deserializers.GroupMessagesDeserializer;
 import com.damnation.etachat.model.deserializers.MessagesDeserializer;
 import com.damnation.etachat.token.Token;
@@ -49,7 +52,7 @@ public class HTTPClient {
         data.put("data", msg);
         data.put("group", group);
         String post = gson.toJson(data);
-        RequestBody body = RequestBody.create(JSON, post);
+        RequestBody body = RequestBody.create(post, JSON);
         Request request = new Request.Builder()
                 .post(body)
                 .url(BASE_URL + GROUPS + "/")
@@ -110,7 +113,7 @@ public class HTTPClient {
         if (dest.equals("global")) url += "global/";
         else data.put("to", dest);
         String post = gson.toJson(data);
-        RequestBody body = RequestBody.create(JSON, post);
+        RequestBody body = RequestBody.create(post, JSON);
         Request request = new Request.Builder()
                 .post(body)
                 .url(url)
@@ -165,7 +168,7 @@ public class HTTPClient {
         data.put("name", name);
         data.put("type", type);
         String post = gson.toJson(data);
-        RequestBody body = RequestBody.create(JSON, post);
+        RequestBody body = RequestBody.create(post, JSON);
         Request request = new Request.Builder()
                 .post(body)
                 .url(BASE_URL + GROUPS + "/room")
@@ -242,7 +245,7 @@ public class HTTPClient {
         data.put("username", username);
         data.put("password", password);
         String post = gson.toJson(data);
-        RequestBody body = RequestBody.create(JSON, post);
+        RequestBody body = RequestBody.create(post, JSON);
         Request request = new Request.Builder()
                 .post(body)
                 .url(BASE_URL + USERS + "/login")
@@ -274,7 +277,7 @@ public class HTTPClient {
         data.put("password", password);
         data.put("password2", password);
         String post = gson.toJson(data);
-        RequestBody body = RequestBody.create(JSON, post);
+        RequestBody body = RequestBody.create(post, JSON);
         Request request = new Request.Builder()
                 .post(body)
                 .url(BASE_URL + USERS + "/register")
