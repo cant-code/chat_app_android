@@ -17,9 +17,9 @@ import java.util.concurrent.Executors;
 
 public class MessagesRepository {
 
-    private HTTPClient httpClient;
-    private Executor executor;
-    private AppDatabase database;
+    private final HTTPClient httpClient;
+    private final Executor executor;
+    private final AppDatabase database;
 
     public MessagesRepository(Context context) {
         httpClient = HTTPClient.INSTANCE;
@@ -75,6 +75,20 @@ public class MessagesRepository {
                 groupMessagesDAO.insertAll(messagesList);
                 callback.onSuccess(messagesList);
             }
+        });
+    }
+
+    public void addMessageToDB(Messages messages) {
+        executor.execute(() -> {
+            MessagesDAO messagesDAO = database.messagesDAO();
+            messagesDAO.insertOne(messages);
+        });
+    }
+
+    public void addMessageToDB(GroupMessages messages) {
+        executor.execute(() -> {
+            GroupMessagesDAO groupMessagesDAO = database.groupMessagesDAO();
+            groupMessagesDAO.insertOne(messages);
         });
     }
 }

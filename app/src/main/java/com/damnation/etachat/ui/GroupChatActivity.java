@@ -2,6 +2,7 @@ package com.damnation.etachat.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,9 +12,9 @@ import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -43,13 +44,13 @@ public class GroupChatActivity extends AppCompatActivity {
     private SwipeRefreshLayout refreshLayout;
     private MessagesRepository repository;
     private List<GroupMessages> messagesList;
-    private Token token;
     private Group group;
     private TextInputLayout messageInput;
     private RecyclerView recyclerView;
     private HTTPClient httpClient;
     private Socket socket;
     private Gson gson;
+    private ImageButton sendButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class GroupChatActivity extends AppCompatActivity {
         group = getIntent().getExtras().getParcelable("EXTRAS");
         ((TextView) findViewById(R.id.chat_name)).setText(group.getUsername());
 
-        token = Token.INSTANCE;
+        Token token = Token.INSTANCE;
         adapter = new GroupMessagesAdapter(token.getId());
 
         gson = new Gson();
@@ -108,7 +109,7 @@ public class GroupChatActivity extends AppCompatActivity {
             }
             return handled;
         });
-        ImageButton sendButton = findViewById(R.id.send);
+        sendButton = findViewById(R.id.send);
         sendButton.setOnClickListener(v -> sendMessage());
 
         recyclerView = findViewById(R.id.chats);
@@ -141,11 +142,13 @@ public class GroupChatActivity extends AppCompatActivity {
                 messagesList.add(messages);
                 adapter.notifyItemInserted(messagesList.size() - 1);
                 recyclerView.scrollToPosition(messagesList.size() - 1);
+                repository.addMessageToDB(messages);
             });
         }
     };
 
     public void sendMessage() {
+        sendButton.setEnabled(false);
         String message = messageInput.getEditText().getText().toString();
         if(message.isEmpty()) {
             messageInput.setError("Message field cannot be empty");
@@ -162,6 +165,7 @@ public class GroupChatActivity extends AppCompatActivity {
                 }
             }, message, group.get_id());
         }
+        sendButton.setEnabled(true);
     }
 
     public static void startGroupChatActivity(Activity activity, Group group) {
@@ -205,7 +209,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private void showErrorSnackbar() {
         View rootView = findViewById(android.R.id.content);
         Snackbar snackbar = Snackbar.make(rootView, "Error Occurred", Snackbar.LENGTH_INDEFINITE);
-        snackbar.setActionTextColor(getResources().getColor(R.color.cyan_500));
+        snackbar.setActionTextColor(ContextCompat.getColor(getApplicationContext(), R.color.cyan_500));
         snackbar.setAction("Retry", v -> {
             loadDataFromNetwork();
             snackbar.dismiss();

@@ -2,6 +2,7 @@ package com.damnation.etachat.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,7 +12,6 @@ import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,7 +33,6 @@ import com.google.gson.Gson;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static com.damnation.etachat.ui.RegisterActivity.getTextWatcher;
@@ -52,6 +51,7 @@ public class ChatActivity extends AppCompatActivity {
     private Socket socket;
     private Gson gson;
     private boolean isGlobal;
+    private ImageButton sendButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +111,7 @@ public class ChatActivity extends AppCompatActivity {
             }
             return handled;
         });
-        ImageButton sendButton = findViewById(R.id.send);
+        sendButton = findViewById(R.id.send);
         sendButton.setOnClickListener(v -> sendMessage());
 
         recyclerView = findViewById(R.id.chats);
@@ -144,11 +144,13 @@ public class ChatActivity extends AppCompatActivity {
                 messagesList.add(messages);
                 adapter.notifyItemInserted(messagesList.size() - 1);
                 recyclerView.scrollToPosition(messagesList.size() - 1);
+                repository.addMessageToDB(messages);
             });
         }
     };
 
     public void sendMessage() {
+        sendButton.setEnabled(false);
         String message = messageInput.getEditText().getText().toString();
         if(message.isEmpty()) {
             messageInput.setError("Message field cannot be empty");
@@ -165,6 +167,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }, message, isGlobal ? "global" : user.get_id());
         }
+        sendButton.setEnabled(true);
     }
 
     public static void startChatActivity(Activity activity, User user) {
