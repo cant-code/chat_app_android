@@ -44,6 +44,39 @@ public class HTTPClient {
         token = Token.INSTANCE;
     }
 
+    public void sendGroupMessage(RegisterCallback callback, String msg, String group) {
+        HashMap<String, String> data = new HashMap<>();
+        data.put("data", msg);
+        data.put("group", group);
+        String post = gson.toJson(data);
+        RequestBody body = RequestBody.create(JSON, post);
+        Request request = new Request.Builder()
+                .post(body)
+                .url(BASE_URL + GROUPS + "/")
+                .addHeader("Authorization", token.getToken())
+                .build();
+        sendMessage(callback, request);
+    }
+
+    private void sendMessage(RegisterCallback callback, Request request) {
+        executor.execute(() -> {
+            try {
+                Response response = client.newCall(request).execute();
+                int code = response.code();
+                if (code == 404 || code == 500) {
+                    Log.e("SendMessageHttp", "Error sending message");
+                    callback.onError("Error sending message");
+                    return;
+                }
+                Objects.requireNonNull(response.body()).close();
+                callback.onSuccess();
+            } catch (Exception e) {
+                Log.e("SendMessageHttp", "Error sending message", e);
+                callback.onError("Error sending message");
+            }
+        });
+    }
+
     public List<GroupMessages> getGroupMessages(String id) {
         Request request = new Request.Builder()
                 .get()
@@ -83,22 +116,7 @@ public class HTTPClient {
                 .url(url)
                 .addHeader("Authorization", token.getToken())
                 .build();
-        executor.execute(() -> {
-            try {
-                Response response = client.newCall(request).execute();
-                int code = response.code();
-                if (code == 404 || code == 500) {
-                    Log.e("SendMessageHttp", "Error sending message");
-                    callback.onError("Error sending message");
-                    return;
-                }
-                Objects.requireNonNull(response.body()).close();
-                callback.onSuccess();
-            } catch (Exception e) {
-                Log.e("SendMessageHttp", "Error sending message", e);
-                callback.onError("Error sending message");
-            }
-        });
+        sendMessage(callback, request);
     }
 
     public List<Messages> getGlobalMessages() {

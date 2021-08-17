@@ -110,7 +110,6 @@ public class GroupChatActivity extends AppCompatActivity {
         });
         ImageButton sendButton = findViewById(R.id.send);
         sendButton.setOnClickListener(v -> sendMessage());
-        sendButton.setEnabled(false);
 
         recyclerView = findViewById(R.id.chats);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -151,7 +150,7 @@ public class GroupChatActivity extends AppCompatActivity {
         if(message.isEmpty()) {
             messageInput.setError("Message field cannot be empty");
         } else {
-            httpClient.sendMessage(new RegisterCallback() {
+            httpClient.sendGroupMessage(new RegisterCallback() {
                 @Override
                 public void onSuccess() {
                     runOnUiThread(() -> messageInput.getEditText().getText().clear());
