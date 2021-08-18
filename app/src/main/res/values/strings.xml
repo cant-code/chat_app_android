@@ -9,23 +9,16 @@
     <string name="action_login">Login</string>
     <string name="action_sign_up">Sign Up</string>
     <string name="action_register">Register</string>
-    <string name="welcome">"Welcome !"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
-    <string name="image_logo">Image Logo</string>
     <string name="sign_up_text">Don\'t have an account? Sign up</string>
     <string name="sign_in_text">Already have an account? Sign In</string>
 
     <!-- Menu Strings -->
     <string name="search">Search</string>
-    <string name="sort">Sort</string>
     <string name="user_avatar">User Avatar</string>
     <string name="logout">Logout</string>
-    <string name="title_activity_main">MainActivity</string>
     <string name="room_name">Room Name</string>
 
     <!-- Chat Strings -->
     <string name="send_message">Send Message</string>
-    <string name="chat_box_hint">Type your message...</string>
+    <string name="chat_box_hint">Type your message…</string>
 </resources>
