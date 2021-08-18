@@ -4,8 +4,8 @@ import android.content.Context;
 import com.damnation.etachat.database.AppDatabase;
 import com.damnation.etachat.database.DatabaseProvider;
 import com.damnation.etachat.database.GroupDAO;
-import com.damnation.etachat.model.Group;
 import com.damnation.etachat.http.HTTPClient;
+import com.damnation.etachat.model.Group;
 import com.damnation.etachat.repository.CallBacks.AddToDBCallback;
 import com.damnation.etachat.repository.CallBacks.DataFromDatabaseCallback;
 import com.damnation.etachat.repository.CallBacks.DataFromNetworkCallback;
@@ -16,9 +16,9 @@ import java.util.concurrent.Executors;
 
 public class GroupRepository {
 
-    private HTTPClient httpClient;
-    private Executor executor;
-    private AppDatabase database;
+    private final HTTPClient httpClient;
+    private final Executor executor;
+    private final AppDatabase database;
 
     public GroupRepository(Context context) {
         httpClient = HTTPClient.INSTANCE;

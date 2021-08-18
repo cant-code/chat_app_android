@@ -13,9 +13,9 @@ public class User implements Parcelable {
 
     @PrimaryKey
     @NonNull
-    private String _id;
-    private String email;
-    private String username;
+    private final String _id;
+    private final String email;
+    private final String username;
 
     public User(@NonNull String _id, String email, String username) {
         this._id = _id;

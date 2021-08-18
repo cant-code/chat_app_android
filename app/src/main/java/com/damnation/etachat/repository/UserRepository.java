@@ -2,8 +2,8 @@ package com.damnation.etachat.repository;
 
 import android.content.Context;
 import com.damnation.etachat.database.AppDatabase;
-import com.damnation.etachat.database.UserDAO;
 import com.damnation.etachat.database.DatabaseProvider;
+import com.damnation.etachat.database.UserDAO;
 import com.damnation.etachat.http.HTTPClient;
 import com.damnation.etachat.model.User;
 import com.damnation.etachat.repository.CallBacks.DataFromDatabaseCallback;
@@ -15,9 +15,9 @@ import java.util.concurrent.Executors;
 
 public class UserRepository {
 
-    private HTTPClient httpClient;
-    private Executor executor;
-    private AppDatabase database;
+    private final HTTPClient httpClient;
+    private final Executor executor;
+    private final AppDatabase database;
 
     public UserRepository(Context context) {
         httpClient = HTTPClient.INSTANCE;

@@ -24,7 +24,7 @@ public class UserAdapter extends ListAdapter<User, UserAdapter.UserAdapterViewHo
         void onItemClicked(User user);
     }
 
-    private OnItemClickListener clickListener;
+    private final OnItemClickListener clickListener;
 
     public UserAdapter(OnItemClickListener clickListener) {
         super(DIFF_CALLBACK);
@@ -61,8 +61,8 @@ public class UserAdapter extends ListAdapter<User, UserAdapter.UserAdapterViewHo
 
     static class UserAdapterViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView textView;
-        private ImageView imageView;
+        private final TextView textView;
+        private final ImageView imageView;
         private User user;
 
         public UserAdapterViewHolder(@NonNull View itemView, OnItemClickListener listener) {

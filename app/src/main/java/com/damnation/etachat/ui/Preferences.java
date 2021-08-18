@@ -8,7 +8,7 @@ public class Preferences {
     public static final String TOKEN = "Token";
     public static final String ID = "id";
 
-    private SharedPreferences preferences;
+    private final SharedPreferences preferences;
 
     Preferences(Context context) {
         preferences = context.getSharedPreferences("eta-chat", Context.MODE_PRIVATE);

@@ -15,8 +15,8 @@ import java.util.List;
 
 public class GroupActionAdapter extends RecyclerView.Adapter<GroupActionAdapter.GroupActionAdapterViewHolder> {
 
-    private List<GroupAction> originalList;
-    private OnItemClicked onItemClicked;
+    private final List<GroupAction> originalList;
+    private final OnItemClicked onItemClicked;
 
     public GroupActionAdapter(OnItemClicked onClick) {
         originalList = new ArrayList<>();
@@ -50,9 +50,8 @@ public class GroupActionAdapter extends RecyclerView.Adapter<GroupActionAdapter.
 
     class GroupActionAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView textView;
-        private ImageView imageView;
-        private GroupAction groupAction;
+        private final TextView textView;
+        private final ImageView imageView;
 
         public GroupActionAdapterViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -62,7 +61,6 @@ public class GroupActionAdapter extends RecyclerView.Adapter<GroupActionAdapter.
         }
 
         void bindTo(GroupAction groupAction) {
-            this.groupAction = groupAction;
             textView.setText(groupAction.getName());
             imageView.setImageResource(groupAction.getIcon());
         }

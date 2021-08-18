@@ -2,8 +2,8 @@ package com.damnation.etachat.model;
 
 public class GroupAction {
 
-    private String name;
-    private int icon;
+    private final String name;
+    private final int icon;
 
     public GroupAction(String name, int icon) {
         this.name = name;

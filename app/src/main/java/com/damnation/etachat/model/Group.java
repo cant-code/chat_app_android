@@ -14,8 +14,8 @@ public class Group implements Parcelable {
 
     @PrimaryKey
     @NonNull
-    private String _id;
-    private String username;
+    private final String _id;
+    private final String username;
 
     public Group(@NonNull String _id, String username) {
         this._id = _id;
