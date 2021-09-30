@@ -87,7 +87,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@id/sendCard"
-                app:placeholderText="@string/chat_box_hint"
+                android:hint="@string/chat_box_hint"
                 android:layout_marginHorizontal="8dp"
                 app:boxCornerRadiusTopStart="32dp"
                 app:boxCornerRadiusTopEnd="32dp"

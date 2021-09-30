@@ -11,7 +11,7 @@
             android:id="@+id/message_self_card"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="#EEF1F6"
+            app:cardBackgroundColor="@color/gray"
             app:cardCornerRadius="12dp"
             app:cardPreventCornerOverlap="false"
             app:cardUseCompatPadding="true"
